@@ -17,7 +17,7 @@ public class ElevatorScene {
 	public static Semaphore personCountMutex;
 	public static Semaphore elevatorWaitMutex;
 	public static Semaphore in;
-	public static Semaphore out;
+	public static Semaphore[] out;
 	public static ElevatorScene scene;
 	
 	public static boolean elevatorsMayDie;
@@ -59,8 +59,10 @@ public class ElevatorScene {
 		personCountMutex = new Semaphore(1);
 		elevatorWaitMutex = new Semaphore(1);
 		in = new Semaphore(0);
-		out = new Semaphore(0);
-		
+		out = new Semaphore[numberOfFloors];
+		for(int i = 0; i < numberOfFloors; i++) {
+			out[i] = new Semaphore(0);
+		}
 		Elevator elevator = new Elevator(this);
 		
 		elevatorThread = new Thread(elevator);
@@ -99,7 +101,7 @@ public class ElevatorScene {
 		 * so that it can be reaped in the testSuite
 		 * (you don't have to join() yourself)
 		 */
-		incrementNumberOfPeopleWaitingAtFloor(sourceFloor);
+		
 		return thread;
 	}
 	

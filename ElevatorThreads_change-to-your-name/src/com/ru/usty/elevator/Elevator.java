@@ -30,32 +30,62 @@ public class Elevator implements Runnable {
 						}
 					}
 					try {
-						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-						
-						scene.incrementFloor(0);
-						System.out.println("up");
+						for(int i = 0; i < scene.getNumberOfFloors() - 1; i++){
+							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+							scene.incrementFloor(0);
+							System.out.println("up");
+							for(int x = 0; x < 6; x++) {
+								try {
+									Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+									ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							}
+						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
-			if(scene.getCurrentFloorForElevator(0) == 1) {
-				for(int i = 0; i < 6; i++) {
+			//if(scene.getCurrentFloorForElevator(0) == 1) {
+	
+			
+			//System.out.println(scene.getNumberOfFloors()+ " numbers of floor " + " had "+ scene.getCurrentFloorForElevator(0));
+			
+			try {
+				for(int i = 0; i < scene.getNumberOfFloors() - 1; i++) {
+					//Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+					for(int x = 0; x < 6; x++) {
+						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+						ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
+						
+					}
+					scene.decrementFloor(0);
+					System.out.println("nidur");
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+				/*for(int x = 0; x < 6; x++) {
 					try {
 						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-						ElevatorScene.out.release();
+						
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
-					
-				}
-				scene.decrementFloor(0);
-				System.out.println("nidur");
-			}
-	}
+				}*/
+			
+			
+			//}
+		}
 
 	}
 }
