@@ -20,19 +20,22 @@ public class Person implements Runnable{
 				//System.out.println("wait");
 				scene.incrementNumberOfPeopleWaitingAtFloor(in);
 				ElevatorScene.in.acquire();
-				System.out.println(out +" here ");
+				scene.incLeaveThisFloor(out);
+				//System.out.println(out +" here ");
 				scene.incrementPeopleInElevator(0);
 				scene.decrementNumberOfPeopleWaitingAtFloor(in);
-				System.out.println(scene.getNumberOfPeopleWaitingAtFloor(0));
+				//System.out.println(scene.getNumberOfPeopleWaitingAtFloor(0));
 				System.out.println("in");
 			//ElevatorScene.elevatorWaitMutex.release();
 				
 			//ElevatorScene.elevatorWaitMutex.acquire();
 				//ElevatorScene.elevatorWaitMutex.acquire();
 				ElevatorScene.out[out].acquire();
+				System.out.println("UT");
+				scene.decLeaveThisFloor(out);
 				//ElevatorScene.elevatorWaitMutex.release();
 				scene.decrementPeopleInElevator(0);
-				System.out.println("ut");
+				//System.out.println("ut");
 			//ElevatorScene.elevatorWaitMutex.release();
 					
 				

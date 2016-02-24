@@ -32,7 +32,7 @@ public class ElevatorScene {
 	
 	private int elevatorFloor = 0;
 	private int pepsInElevator = 0;
-
+	ArrayList<Integer> leaveCount;
 	ArrayList<Integer> personCount; //use if you want but
 									//throw away and
 									//implement differently
@@ -86,6 +86,10 @@ public class ElevatorScene {
 		for(int i = 0; i < numberOfFloors; i++) {
 			this.personCount.add(0);
 		}
+		leaveCount = new ArrayList<Integer>();
+		for(int i = 0; i < numberOfFloors; i++) {
+			this.leaveCount.add(0);
+		}
 	}
 	//Base function: definition must not change
 	//Necessary to add your code in this one
@@ -112,6 +116,33 @@ public class ElevatorScene {
 		}
 	}
 	
+	public int leaveThisFloor(int floor) {
+		return leaveCount.get(floor);
+	}
+	
+	public void incLeaveThisFloor(int floor) {
+		try {
+			personCountMutex.acquire();
+				leaveCount.set(floor, (leaveCount.get(floor) + 1));
+			personCountMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void decLeaveThisFloor(int floor) {
+		try {
+			personCountMutex.acquire();
+				leaveCount.set(floor, (leaveCount.get(floor) - 1));
+			personCountMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+	}
 	public void incrementFloor(int elevator){
 		elevatorFloor++;
 	}
@@ -169,7 +200,11 @@ public class ElevatorScene {
 		}*/
 		return pepsInElevator;
 	}
-
+	
+	public int checkSpaceInElevator() {
+		return 6 - pepsInElevator;
+	}
+	
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleWaitingAtFloor(int floor) {
 
