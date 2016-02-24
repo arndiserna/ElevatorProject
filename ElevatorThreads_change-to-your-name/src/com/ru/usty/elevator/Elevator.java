@@ -15,18 +15,25 @@ public class Elevator implements Runnable {
 			}
 			// TODO Auto-generated method stub
 			//for(int i = 0; i < 6; i++) {
-				
-			ElevatorScene.personSemaphore.release(); // signal
+			
+				//ElevatorScene.personSemaphore.release(); // signal
 			if(scene.getCurrentFloorForElevator(0) == 0) {
 				if(scene.getNumberOfPeopleInElevator(0) == 0) {
-					for(int i = 0; i < 6; i++){
-					ElevatorScene.in.release();
+					for(int i = 0; i < 6; i++) {
+						try {
+							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+							ElevatorScene.in.release();
+							
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
-					
 					try {
 						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 						
 						scene.incrementFloor(0);
+						System.out.println("up");
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -34,15 +41,19 @@ public class Elevator implements Runnable {
 				}
 			}
 			if(scene.getCurrentFloorForElevator(0) == 1) {
-				ElevatorScene.out.release();
-				try {
-					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				for(int i = 0; i < 6; i++) {
+					try {
+						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+						ElevatorScene.out.release();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
 				}
-				scene.decrementPeopleInElevator(0);
 				scene.decrementFloor(0);
+				System.out.println("nidur");
 			}
 	}
 
