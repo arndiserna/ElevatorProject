@@ -27,8 +27,10 @@ public class Person implements Runnable{
 				System.out.println("in");
 			//ElevatorScene.elevatorWaitMutex.release();
 				
-			//ElevatorScene.elevatorWaitMutex.acquire();		
+			//ElevatorScene.elevatorWaitMutex.acquire();
+				//ElevatorScene.elevatorWaitMutex.acquire();
 				ElevatorScene.out[out].acquire();
+				//ElevatorScene.elevatorWaitMutex.release();
 				scene.decrementPeopleInElevator(0);
 				System.out.println("ut");
 			//ElevatorScene.elevatorWaitMutex.release();
