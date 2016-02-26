@@ -48,3 +48,4 @@ Temporary Items
 ElevatorThreads_change-to-your-name/bin/*
 bin/**
 
+*.class
