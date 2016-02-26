@@ -12,8 +12,8 @@ public class ElevatorMainProgram {
 /***EXPERIMENT HERE BUT THIS WILL BE CHANGED DURING GRADING***/
 
 			Thread.sleep(1000);
-
-			TestSuite.runTest(2);
+			// dsakdkas
+			TestSuite.runTest(3);
 
 			Thread.sleep(2000);
 
