@@ -28,8 +28,9 @@ public class Person implements Runnable{
 				scene.decLeaveThisFloor(out);
 				//ElevatorScene.elevatorWaitMutex.release();
 				scene.decrementPeopleInElevator(0);
-
-			
+				if(scene.leaveThisFloor(out) == 0) {
+					ElevatorScene.allOut.release();
+				}
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

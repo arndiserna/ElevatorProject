@@ -18,6 +18,7 @@ public class ElevatorScene {
 	public static Semaphore elevatorWaitMutex;
 	public static Semaphore[] in;
 	public static Semaphore[] out;
+	public static Semaphore allOut;
 	public static ElevatorScene scene;
 	
 	public static boolean elevatorsMayDie;
@@ -55,6 +56,7 @@ public class ElevatorScene {
 		}
 		elevatorsMayDie = false;
 		scene = this;
+		allOut = new Semaphore(0);
 		personSemaphore = new Semaphore(0);
 		personCountMutex = new Semaphore(1);
 		elevatorWaitMutex = new Semaphore(1);

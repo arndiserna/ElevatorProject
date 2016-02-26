@@ -29,6 +29,9 @@ public class Elevator implements Runnable {
 					
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(0));
+					if(leaveElevator == 0){
+						ElevatorScene.allOut.release();
+					}
 					ElevatorScene.elevatorWaitMutex.release();
 					for(int x = 0; x < leaveElevator ; x++) {
 						try {
@@ -42,10 +45,13 @@ public class Elevator implements Runnable {
 						}
 						
 					}
+					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator();
+					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
+					System.out.println(waitingAtFloor + " bíða");
 					ElevatorScene.elevatorWaitMutex.release();
-					if(space != 0) {
+					if(space != 0) { //&& 6 < waitingAtFloor
 						for(int x = 0; x < space; x++) {
 							try {
 								Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
@@ -57,6 +63,20 @@ public class Elevator implements Runnable {
 							}
 						}
 					}
+					/*else {     //else if(waitingAtFloor != 0)
+						
+						for(int x = 0; x < waitingAtFloor; x++) {
+							try {
+								Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+								ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+								
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					
+					}*/
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 					if(numberOfFloor - 1 != scene.getCurrentFloorForElevator(0)) {
 						scene.incrementFloor(0);
