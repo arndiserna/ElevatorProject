@@ -8,15 +8,12 @@ public class Elevator implements Runnable {
 	}
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		
 		while(true) {
+			
 			if(ElevatorScene.elevatorsMayDie) {
 				return;
 			}
-			// TODO Auto-generated method stub
-			//for(int i = 0; i < 6; i++) {
-			
-				//ElevatorScene.personSemaphore.release(); // signal
 			if(scene.getCurrentFloorForElevator(0) == 0) {
 				try {
 					ElevatorScene.elevatorWaitMutex.acquire();
@@ -25,14 +22,13 @@ public class Elevator implements Runnable {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				int test2 = scene.checkSpaceInElevator();
+				int space = scene.checkSpaceInElevator();
 				ElevatorScene.elevatorWaitMutex.release();
-				if(test2 != 0) {
-					for(int i = 0; i < test2; i++) {
+				if(space != 0) {
+					for(int i = 0; i < space; i++) {
 						try {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-							//System.out.println("open");
-							ElevatorScene.in.release();
+							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
 							
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -43,14 +39,12 @@ public class Elevator implements Runnable {
 						
 						
 						for(int i = 0; i < scene.getNumberOfFloors(); i++){
-							System.out.println(scene.leaveThisFloor(scene.getCurrentFloorForElevator(0)) + " ut wata ");
 							ElevatorScene.elevatorWaitMutex.acquire();
-							int test = scene.leaveThisFloor(scene.getCurrentFloorForElevator(0));
+							int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(0));
 							ElevatorScene.elevatorWaitMutex.release();
-							for(int x = 0; x < test ; x++) {
+							for(int x = 0; x < leaveElevator ; x++) {
 								try {
 									Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-									System.out.println("ÚTTTTTTTTTTTTT");
 									//ElevatorScene.elevatorWaitMutex.acquire();
 									ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
 									//ElevatorScene.elevatorWaitMutex.release();
@@ -74,15 +68,9 @@ public class Elevator implements Runnable {
 					}
 				}
 			}
-			//if(scene.getCurrentFloorForElevator(0) == 1) {
-	
-			
-			//System.out.println(scene.getNumberOfFloors()+ " numbers of floor " + " had "+ scene.getCurrentFloorForElevator(0));
-			
 			try {
 				for(int i = 0; i < scene.getNumberOfFloors(); i++) {
 					//Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-					System.out.println(scene.getCurrentFloorForElevator(0) + " had");
 					/*for(int x = 0; x < scene.getNumberOfPeopleInElevator(0); x++) {
 						
 						ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
@@ -96,20 +84,7 @@ public class Elevator implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
-				/*for(int x = 0; x < 6; x++) {
-					try {
-						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-						
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				}*/
-			
-			
-			//}
+	
 		}
 
 	}

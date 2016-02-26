@@ -16,7 +16,7 @@ public class ElevatorScene {
 	public static Semaphore personSemaphore;
 	public static Semaphore personCountMutex;
 	public static Semaphore elevatorWaitMutex;
-	public static Semaphore in;
+	public static Semaphore[] in;
 	public static Semaphore[] out;
 	public static ElevatorScene scene;
 	
@@ -58,7 +58,10 @@ public class ElevatorScene {
 		personSemaphore = new Semaphore(0);
 		personCountMutex = new Semaphore(1);
 		elevatorWaitMutex = new Semaphore(1);
-		in = new Semaphore(0);
+		in = new Semaphore[numberOfFloors];
+		for(int i = 0; i < numberOfFloors; i++) {
+			in[i] = new Semaphore(0);
+		}
 		out = new Semaphore[numberOfFloors];
 		for(int i = 0; i < numberOfFloors; i++) {
 			out[i] = new Semaphore(0);
