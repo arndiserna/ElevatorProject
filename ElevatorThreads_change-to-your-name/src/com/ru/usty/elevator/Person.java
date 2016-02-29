@@ -16,7 +16,9 @@ public class Person implements Runnable{
 		try {
 			//ElevatorScene.elevatorWaitMutex.acquire();
 				//ElevatorScene.personSemaphore.acquire();//Wait
+				
 				scene.incrementNumberOfPeopleWaitingAtFloor(in);
+				//ElevatorScene.personSemaphore.release();
 				ElevatorScene.in[in].acquire();
 				scene.incLeaveThisFloor(out);
 				scene.incrementPeopleInElevator(0);

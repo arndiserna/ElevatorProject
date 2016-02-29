@@ -1,7 +1,7 @@
 package com.ru.usty.elevator;
 
 public class Elevator implements Runnable {
-	
+	int counter = 0;
 	ElevatorScene scene;
 	public Elevator(ElevatorScene scene) {
 		this.scene = scene;
@@ -9,6 +9,12 @@ public class Elevator implements Runnable {
 	@Override
 	public void run() {
 		
+		/*try {
+			ElevatorScene.personSemaphore.acquire();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
 		while(true) {
 			
 			if(ElevatorScene.elevatorsMayDie) {
@@ -42,29 +48,22 @@ public class Elevator implements Runnable {
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator();
-					//int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
-					//System.out.println(waitingAtFloor + " bíða");
+					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
+					System.out.println(waitingAtFloor + " bíða");
 					ElevatorScene.elevatorWaitMutex.release();
-					if(space != 0) { //&& 6 < waitingAtFloor
+					if((space > waitingAtFloor && counter == 1)){
+						System.out.println("tekk");
+						for(int x = 0; x < waitingAtFloor; x++) {
+							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+						}
+					}
+					else if(space != 0) {
 						for(int x = 0; x < space; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
 						}
 					}
-					/*else {     //else if(waitingAtFloor != 0)
-						
-						for(int x = 0; x < waitingAtFloor; x++) {
-							try {
-								Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-								ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
-								
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					
-					}*/
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 					if(numberOfFloor - 1 != scene.getCurrentFloorForElevator(0)) {
 						scene.incrementFloor(0);
@@ -95,16 +94,21 @@ public class Elevator implements Runnable {
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator();
-					//int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
-					//System.out.println(waitingAtFloor + " bíða");
+					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
 					ElevatorScene.elevatorWaitMutex.release();
-					if(space != 0) { //&& 6 < waitingAtFloor
+					if((space > waitingAtFloor && counter == 1)){
+						System.out.println("tekk");
+						for(int x = 0; x < waitingAtFloor; x++) {
+							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+						}
+					}
+					else if(space != 0) { //&& 6 < waitingAtFloor
 						for(int x = 0; x < space; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
 						}
 					}
-					
 					
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 					scene.decrementFloor(0);
@@ -114,7 +118,7 @@ public class Elevator implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
+			counter = 1;
 		}
 
 	}
