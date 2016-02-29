@@ -19,8 +19,8 @@ public class ElevatorScene {
 	public static Semaphore[] in;
 	public static Semaphore[] out;
 	public static Semaphore allOut;
-	public static ElevatorScene scene;
-	
+	public static ElevatorScene scene;	
+	public static Semaphore exitedCountMutex;
 	public static boolean elevatorsMayDie;
 
 	//TO SPEED THINGS UP WHEN TESTING,
@@ -33,7 +33,9 @@ public class ElevatorScene {
 	
 	private int elevatorFloor = 0;
 	private int pepsInElevator = 0;
+	
 	ArrayList<Integer> leaveCount;
+	ArrayList<Integer> exitedCount = null;
 	ArrayList<Integer> personCount; //use if you want but
 									//throw away and
 									//implement differently
@@ -60,6 +62,7 @@ public class ElevatorScene {
 		personSemaphore = new Semaphore(0);
 		personCountMutex = new Semaphore(1);
 		elevatorWaitMutex = new Semaphore(1);
+		exitedCountMutex = new Semaphore(1);
 		in = new Semaphore[numberOfFloors];
 		for(int i = 0; i < numberOfFloors; i++) {
 			in[i] = new Semaphore(0);
@@ -86,11 +89,21 @@ public class ElevatorScene {
 
 		this.numberOfFloors = numberOfFloors;
 		this.numberOfElevators = numberOfElevators;
-
+		
 		personCount = new ArrayList<Integer>();
+		
 		for(int i = 0; i < numberOfFloors; i++) {
 			this.personCount.add(0);
 		}
+		if(exitedCount == null) {
+			exitedCount = new ArrayList<Integer>();
+		}else {
+			exitedCount.clear();
+		}
+		for(int i = 0; i < numberOfFloors; i++) {
+			this.exitedCount.add(0);
+		}
+		
 		leaveCount = new ArrayList<Integer>();
 		for(int i = 0; i < numberOfFloors; i++) {
 			this.leaveCount.add(0);
@@ -120,7 +133,26 @@ public class ElevatorScene {
 			elevatorFloor--;
 		}
 	}
-	
+	public void personExitsAtFloor(int floor) {
+		try {
+			
+			exitedCountMutex.acquire();
+			exitedCount.set(floor, (exitedCount.get(floor) + 1));
+			exitedCountMutex.release();
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public int getExitedCountAtFloor(int floor) {
+		if(floor < getNumberOfFloors()) {
+			return exitedCount.get(floor);
+		}
+		else {
+			return 0;
+		}
+	}
 	public int leaveThisFloor(int floor) {
 		return leaveCount.get(floor);
 	}
@@ -128,7 +160,7 @@ public class ElevatorScene {
 	public void incLeaveThisFloor(int floor) {
 		try {
 			personCountMutex.acquire();
-				leaveCount.set(floor, (leaveCount.get(floor) + 1));
+			leaveCount.set(floor, (leaveCount.get(floor) + 1));
 			personCountMutex.release();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -140,7 +172,7 @@ public class ElevatorScene {
 	public void decLeaveThisFloor(int floor) {
 		try {
 			personCountMutex.acquire();
-				leaveCount.set(floor, (leaveCount.get(floor) - 1));
+			leaveCount.set(floor, (leaveCount.get(floor) - 1));
 			personCountMutex.release();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

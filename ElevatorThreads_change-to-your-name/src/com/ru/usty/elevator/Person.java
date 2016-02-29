@@ -26,6 +26,7 @@ public class Person implements Runnable{
 				ElevatorScene.out[out].acquire();
 				System.out.println("UT");
 				scene.decLeaveThisFloor(out);
+				scene.personExitsAtFloor(out);
 				//ElevatorScene.elevatorWaitMutex.release();
 				scene.decrementPeopleInElevator(0);
 				if(scene.leaveThisFloor(out) == 0) {
