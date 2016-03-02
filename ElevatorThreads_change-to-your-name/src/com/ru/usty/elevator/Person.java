@@ -3,6 +3,7 @@ package com.ru.usty.elevator;
 public class Person implements Runnable{
 	int in, out;
 	ElevatorScene scene;
+	int inElevatorId;
 	public Person(int in, int out, ElevatorScene scene){
 		this.in = in;
 		this.out = out;
@@ -20,18 +21,21 @@ public class Person implements Runnable{
 				scene.incrementNumberOfPeopleWaitingAtFloor(in);
 				//ElevatorScene.personSemaphore.release();
 				ElevatorScene.in[in].acquire();
-				scene.incLeaveThisFloor(out);
+				ElevatorScene.personCountMutex.acquire();
+				inElevatorId = scene.getElevatorID();
+				ElevatorScene.personCountMutex.acquire();
+				scene.incLeaveThisFloor(out, inElevatorId);
 				scene.incrementPeopleInElevator(0);
 				scene.decrementNumberOfPeopleWaitingAtFloor(in);
 				System.out.println("in");
 				//ElevatorScene.elevatorWaitMutex.acquire();
 				ElevatorScene.out[out].acquire();
 				System.out.println("UT");
-				scene.decLeaveThisFloor(out);
+				scene.decLeaveThisFloor(out, inElevatorId);
 				scene.personExitsAtFloor(out);
 				//ElevatorScene.elevatorWaitMutex.release();
 				scene.decrementPeopleInElevator(0);
-				if(scene.leaveThisFloor(out) == 0) {
+				if(scene.leaveThisFloor(out, inElevatorId) == 0) {
 					ElevatorScene.allOut.release();
 				}
 

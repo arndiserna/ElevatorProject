@@ -36,8 +36,10 @@ public class Elevator implements Runnable {
 				for(int i = 0; i < numberOfFloor; i++){
 					
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id));
+					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id), id);
+					System.out.println(leaveElevator + " asdad");
 					if(leaveElevator == 0){
+		
 						ElevatorScene.allOut.release();
 					}
 					ElevatorScene.elevatorWaitMutex.release();
@@ -50,9 +52,10 @@ public class Elevator implements Runnable {
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator(id);
-					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
+					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(id));
+					scene.setElevatorID(id);
+					
 					System.out.println(waitingAtFloor + " bíða");
-					ElevatorScene.elevatorWaitMutex.release();
 					if((space > waitingAtFloor && counter == 1)){
 						System.out.println("tekk");
 						for(int x = 0; x < waitingAtFloor; x++) {
@@ -66,6 +69,7 @@ public class Elevator implements Runnable {
 							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
+					ElevatorScene.elevatorWaitMutex.release();
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 					if(numberOfFloor - 1 != scene.getCurrentFloorForElevator(id)) {
 						scene.incrementFloor(id);
@@ -82,7 +86,7 @@ public class Elevator implements Runnable {
 				for(int i = 0; i < numberOfFloor; i++) {
 					
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id));
+					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id), id);
 					if(leaveElevator == 0){
 						ElevatorScene.allOut.release();
 					}
@@ -97,7 +101,7 @@ public class Elevator implements Runnable {
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator(id);
 					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(id));
-					ElevatorScene.elevatorWaitMutex.release();
+					scene.setElevatorID(id);
 					if((space > waitingAtFloor && counter == 1)){
 						System.out.println("tekk");
 						for(int x = 0; x < waitingAtFloor; x++) {
@@ -111,7 +115,7 @@ public class Elevator implements Runnable {
 							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
-					
+					ElevatorScene.elevatorWaitMutex.release();
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 					scene.decrementFloor(id);
 					System.out.println("nidur");

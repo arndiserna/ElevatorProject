@@ -29,12 +29,14 @@ public class ElevatorScene {
 
 	private int numberOfFloors;
 	private int numberOfElevators;
+	private int elevatorID;
 	private Thread [] elevatorThread = null;
 	
 	ArrayList<Integer> elevatorFloor;
 	ArrayList<Integer> pepsInElevator;
 	
-	ArrayList<Integer> leaveCount;
+	ArrayList<ArrayList<Integer>> leaveCount;
+	ArrayList<Integer> elevetorLeave;
 	ArrayList<Integer> exitedCount = null;
 	ArrayList<Integer> personCount; //use if you want but
 									//throw away and
@@ -75,28 +77,21 @@ public class ElevatorScene {
 		}
 		//Elevator elevator = new Elevator(this);
 		
-		elevatorThread = new Thread[numberOfElevators];
-		
-		for(int i = 0; i < numberOfElevators; i++) {
-			elevatorThread[i] = new Thread(new Elevator(this, i));
-			elevatorThread[i].start();
-		}
-		
-		/**
-		 * Important to add code here to make new
-		 * threads that run your elevator-runnables
-		 * 
-		 * Also add any other code that initializes
-		 * your system for a new run
-		 * 
-		 * If you can, tell any currently running
-		 * elevator threads to stop
-		 */
 
 		this.numberOfFloors = numberOfFloors;
 		this.numberOfElevators = numberOfElevators;
 		
 		personCount = new ArrayList<Integer>();
+		pepsInElevator = new ArrayList<Integer>();
+		elevatorFloor = new ArrayList<Integer>();
+		
+		for(int i = 0; i < numberOfElevators; i++) {
+			this.pepsInElevator.add(0);
+		}
+		
+		for(int i = 0; i < numberOfElevators; i++) {
+			this.elevatorFloor.add(0);
+		}
 		
 		for(int i = 0; i < numberOfFloors; i++) {
 			this.personCount.add(0);
@@ -110,10 +105,35 @@ public class ElevatorScene {
 			this.exitedCount.add(0);
 		}
 		
-		leaveCount = new ArrayList<Integer>();
+		leaveCount = new ArrayList<ArrayList<Integer>>();
 		for(int i = 0; i < numberOfFloors; i++) {
-			this.leaveCount.add(0);
+			elevetorLeave = new ArrayList<Integer>();
+			this.leaveCount.add(0, elevetorLeave);
+			for(int k = 0; k < numberOfElevators; k++) {
+				elevetorLeave.add(0);
+			}
 		}
+		elevatorThread = new Thread[numberOfElevators];
+
+		for(int i = 0; i < numberOfElevators; i++) {
+			elevatorThread[i] = new Thread(new Elevator(this, i));
+			elevatorThread[i].start();
+		}
+	}
+	
+	public void setElevatorID(int elevator) {
+		try {
+			elevatorWaitMutex.acquire();
+				elevatorID = elevator;
+			elevatorWaitMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public int getElevatorID() {		
+		return elevatorID;
 	}
 	//Base function: definition must not change
 	//Necessary to add your code in this one
@@ -178,14 +198,14 @@ public class ElevatorScene {
 			return 0;
 		}
 	}
-	public int leaveThisFloor(int floor) {
-		return leaveCount.get(floor);
+	public int leaveThisFloor(int floor, int elevator) {
+		return leaveCount.get(floor).get(elevator);
 	}
 	
-	public void incLeaveThisFloor(int floor) {
+	public void incLeaveThisFloor(int floor, int elevator) {
 		try {
 			personCountMutex.acquire();
-			leaveCount.set(floor, (leaveCount.get(floor) + 1));
+			leaveCount.get(floor).set(elevator, leaveCount.get(floor).get(elevator) + 1);
 			personCountMutex.release();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -194,10 +214,10 @@ public class ElevatorScene {
 		
 	}
 	
-	public void decLeaveThisFloor(int floor) {
+	public void decLeaveThisFloor(int floor, int elevator) {
 		try {
 			personCountMutex.acquire();
-			leaveCount.set(floor, (leaveCount.get(floor) - 1));
+			leaveCount.get(floor).set(elevator, leaveCount.get(floor).get(elevator) - 1);
 			personCountMutex.release();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
