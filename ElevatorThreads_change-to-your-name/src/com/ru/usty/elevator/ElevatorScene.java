@@ -29,10 +29,10 @@ public class ElevatorScene {
 
 	private int numberOfFloors;
 	private int numberOfElevators;
-	private Thread elevatorThread = null;
+	private Thread [] elevatorThread = null;
 	
-	private int elevatorFloor = 0;
-	private int pepsInElevator = 0;
+	ArrayList<Integer> elevatorFloor;
+	ArrayList<Integer> pepsInElevator;
 	
 	ArrayList<Integer> leaveCount;
 	ArrayList<Integer> exitedCount = null;
@@ -47,12 +47,14 @@ public class ElevatorScene {
 
 		elevatorsMayDie = true;
 		if(elevatorThread != null) {
-			if(elevatorThread.isAlive()) {
-				try {
-					elevatorThread.join();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			for(int i = 0; i < numberOfElevators; i++) {
+				if(elevatorThread[i].isAlive()) {
+					try {
+						elevatorThread[i].join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -71,10 +73,14 @@ public class ElevatorScene {
 		for(int i = 0; i < numberOfFloors; i++) {
 			out[i] = new Semaphore(0);
 		}
-		Elevator elevator = new Elevator(this);
+		//Elevator elevator = new Elevator(this);
 		
-		elevatorThread = new Thread(elevator);
-		elevatorThread.start();
+		elevatorThread = new Thread[numberOfElevators];
+		
+		for(int i = 0; i < numberOfElevators; i++) {
+			elevatorThread[i] = new Thread(new Elevator(this, i));
+			elevatorThread[i].start();
+		}
 		
 		/**
 		 * Important to add code here to make new
@@ -128,11 +134,30 @@ public class ElevatorScene {
 	}
 	
 	public void decrementFloor(int elevator){
-		if(elevatorFloor != 0)
-		{
-			elevatorFloor--;
+		try {
+			elevatorWaitMutex.acquire();
+			if(elevatorFloor.get(elevator) != 0)
+			{
+				elevatorFloor.set(elevator, (elevatorFloor.get(elevator) - 1));
+			}
+			elevatorWaitMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+	
+	public void incrementFloor(int elevator){
+		try {
+			elevatorWaitMutex.acquire();
+				elevatorFloor.set(elevator, (elevatorFloor.get(elevator) + 1));
+			elevatorWaitMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void personExitsAtFloor(int floor) {
 		try {
 			
@@ -180,17 +205,28 @@ public class ElevatorScene {
 		}
 	
 	}
-	public void incrementFloor(int elevator){
-		elevatorFloor++;
-	}
 	
 	public void incrementPeopleInElevator(int elevator){
-		pepsInElevator++;
+		try {
+			elevatorWaitMutex.acquire();
+				pepsInElevator.set(elevator, (pepsInElevator.get(elevator) + 1));
+			elevatorWaitMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void decrementPeopleInElevator(int elevator){
-		if(pepsInElevator != 0){
-			pepsInElevator--;
+		try {
+			elevatorWaitMutex.acquire();
+			if(pepsInElevator.get(elevator) != 0){
+				pepsInElevator.set(elevator, (pepsInElevator.get(elevator) - 1));
+			}
+			elevatorWaitMutex.release();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -223,23 +259,16 @@ public class ElevatorScene {
 	public int getCurrentFloorForElevator(int elevator) {
 
 		//dumb code, replace it!
-		return elevatorFloor;
+		return elevatorFloor.get(elevator);
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
-		
-		//dumb code, replace it!
-		/*switch(elevator) {
-		case 1: return 1;
-		case 2: return 4;
-		default: return 3;
-		}*/
-		return pepsInElevator;
+		return pepsInElevator.get(elevator);
 	}
 	
-	public int checkSpaceInElevator() {
-		return 6 - pepsInElevator;
+	public int checkSpaceInElevator(int elevator) {
+		return 6 - pepsInElevator.get(elevator);
 	}
 	
 	//Base function: definition must not change, but add your code

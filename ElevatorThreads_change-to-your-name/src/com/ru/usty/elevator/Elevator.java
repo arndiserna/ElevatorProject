@@ -2,9 +2,11 @@ package com.ru.usty.elevator;
 
 public class Elevator implements Runnable {
 	int counter = 0;
+	int id;
 	ElevatorScene scene;
-	public Elevator(ElevatorScene scene) {
+	public Elevator(ElevatorScene scene, int id) {
 		this.scene = scene;
+		this.id = id;
 	}
 	@Override
 	public void run() {
@@ -34,7 +36,7 @@ public class Elevator implements Runnable {
 				for(int i = 0; i < numberOfFloor; i++){
 					
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(0));
+					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id));
 					if(leaveElevator == 0){
 						ElevatorScene.allOut.release();
 					}
@@ -42,12 +44,12 @@ public class Elevator implements Runnable {
 					for(int x = 0; x < leaveElevator ; x++) {
 						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 						//ElevatorScene.elevatorWaitMutex.acquire();
-						ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
+						ElevatorScene.out[scene.getCurrentFloorForElevator(id)].release();
 						//ElevatorScene.elevatorWaitMutex.release();
 					}
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int space = scene.checkSpaceInElevator();
+					int space = scene.checkSpaceInElevator(id);
 					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
 					System.out.println(waitingAtFloor + " bíða");
 					ElevatorScene.elevatorWaitMutex.release();
@@ -55,18 +57,18 @@ public class Elevator implements Runnable {
 						System.out.println("tekk");
 						for(int x = 0; x < waitingAtFloor; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
 					else if(space != 0) {
 						for(int x = 0; x < space; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-					if(numberOfFloor - 1 != scene.getCurrentFloorForElevator(0)) {
-						scene.incrementFloor(0);
+					if(numberOfFloor - 1 != scene.getCurrentFloorForElevator(id)) {
+						scene.incrementFloor(id);
 					}
 					System.out.println("up");
 	
@@ -80,7 +82,7 @@ public class Elevator implements Runnable {
 				for(int i = 0; i < numberOfFloor; i++) {
 					
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(0));
+					int leaveElevator = scene.leaveThisFloor(scene.getCurrentFloorForElevator(id));
 					if(leaveElevator == 0){
 						ElevatorScene.allOut.release();
 					}
@@ -88,30 +90,30 @@ public class Elevator implements Runnable {
 					for(int x = 0; x < leaveElevator ; x++) {
 						Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 						//ElevatorScene.elevatorWaitMutex.acquire();
-						ElevatorScene.out[scene.getCurrentFloorForElevator(0)].release();
+						ElevatorScene.out[scene.getCurrentFloorForElevator(id)].release();
 						//ElevatorScene.elevatorWaitMutex.release();
 					}
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
-					int space = scene.checkSpaceInElevator();
-					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(0));
+					int space = scene.checkSpaceInElevator(id);
+					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(id));
 					ElevatorScene.elevatorWaitMutex.release();
 					if((space > waitingAtFloor && counter == 1)){
 						System.out.println("tekk");
 						for(int x = 0; x < waitingAtFloor; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
 					else if(space != 0) { //&& 6 < waitingAtFloor
 						for(int x = 0; x < space; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-							ElevatorScene.in[scene.getCurrentFloorForElevator(0)].release();
+							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();
 						}
 					}
 					
 					Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
-					scene.decrementFloor(0);
+					scene.decrementFloor(id);
 					System.out.println("nidur");
 				}
 			} catch (InterruptedException e) {
