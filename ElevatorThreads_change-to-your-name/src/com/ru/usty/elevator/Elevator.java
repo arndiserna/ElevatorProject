@@ -52,6 +52,7 @@ public class Elevator implements Runnable {
 					ElevatorScene.allOut.acquire();
 					ElevatorScene.elevatorWaitMutex.acquire();
 					int space = scene.checkSpaceInElevator(id);
+					System.out.println(space + " space");
 					int waitingAtFloor = scene.getNumberOfPeopleWaitingAtFloor(scene.getCurrentFloorForElevator(id));
 					scene.setElevatorID(id);
 					
@@ -64,6 +65,7 @@ public class Elevator implements Runnable {
 						}
 					}
 					else if(space != 0) {
+						System.out.println(id + " lyfta");
 						for(int x = 0; x < space; x++) {
 							Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 							ElevatorScene.in[scene.getCurrentFloorForElevator(id)].release();

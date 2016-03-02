@@ -21,13 +21,14 @@ public class Person implements Runnable{
 				scene.incrementNumberOfPeopleWaitingAtFloor(in);
 				//ElevatorScene.personSemaphore.release();
 				ElevatorScene.in[in].acquire();
-				ElevatorScene.personCountMutex.acquire();
+				ElevatorScene.insideMutex.acquire();
 				inElevatorId = scene.getElevatorID();
-				ElevatorScene.personCountMutex.acquire();
+				
 				scene.incLeaveThisFloor(out, inElevatorId);
-				scene.incrementPeopleInElevator(0);
+				scene.incrementPeopleInElevator(inElevatorId);
 				scene.decrementNumberOfPeopleWaitingAtFloor(in);
 				System.out.println("in");
+				ElevatorScene.insideMutex.release();
 				//ElevatorScene.elevatorWaitMutex.acquire();
 				ElevatorScene.out[out].acquire();
 				System.out.println("UT");

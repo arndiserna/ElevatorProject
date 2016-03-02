@@ -16,6 +16,7 @@ public class ElevatorScene {
 	public static Semaphore personSemaphore;
 	public static Semaphore personCountMutex;
 	public static Semaphore elevatorWaitMutex;
+	public static Semaphore insideMutex;
 	public static Semaphore[] in;
 	public static Semaphore[] out;
 	public static Semaphore allOut;
@@ -66,6 +67,7 @@ public class ElevatorScene {
 		personSemaphore = new Semaphore(0);
 		personCountMutex = new Semaphore(1);
 		elevatorWaitMutex = new Semaphore(1);
+		insideMutex = new Semaphore(1);
 		exitedCountMutex = new Semaphore(1);
 		in = new Semaphore[numberOfFloors];
 		for(int i = 0; i < numberOfFloors; i++) {
@@ -122,14 +124,8 @@ public class ElevatorScene {
 	}
 	
 	public void setElevatorID(int elevator) {
-		try {
-			elevatorWaitMutex.acquire();
-				elevatorID = elevator;
-			elevatorWaitMutex.release();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		elevatorID = elevator;
 	}
 	
 	public int getElevatorID() {		
@@ -227,40 +223,18 @@ public class ElevatorScene {
 	}
 	
 	public void incrementPeopleInElevator(int elevator){
-		try {
-			elevatorWaitMutex.acquire();
-				pepsInElevator.set(elevator, (pepsInElevator.get(elevator) + 1));
-			elevatorWaitMutex.release();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		pepsInElevator.set(elevator, (pepsInElevator.get(elevator) + 1));
 	}
 	
 	public void decrementPeopleInElevator(int elevator){
-		try {
-			elevatorWaitMutex.acquire();
-			if(pepsInElevator.get(elevator) != 0){
-				pepsInElevator.set(elevator, (pepsInElevator.get(elevator) - 1));
-			}
-			elevatorWaitMutex.release();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		if(pepsInElevator.get(elevator) != 0){
+			pepsInElevator.set(elevator, (pepsInElevator.get(elevator) - 1));
 		}
 	}
 	
 	public void decrementNumberOfPeopleWaitingAtFloor(int floor){
-		try {
-			personCountMutex.acquire();
-				personCount.set(floor, (personCount.get(floor)- 1));
-			personCountMutex.release();
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		personCount.set(floor, (personCount.get(floor)- 1));
 	}
 	public void incrementNumberOfPeopleWaitingAtFloor(int floor){
 		try {
