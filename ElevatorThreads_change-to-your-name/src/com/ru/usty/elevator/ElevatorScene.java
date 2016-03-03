@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 
 public class ElevatorScene {
 	
-	public static Semaphore personSemaphore;
+	public static Semaphore setIDSemaphore;
 	public static Semaphore getIDSemaphore;
 	public static Semaphore checkedOutSemaphore;
 	public static Semaphore personCountMutex;
@@ -29,10 +29,8 @@ public class ElevatorScene {
 	public static Semaphore elvatorInMutex;
 	public static Semaphore elvatorOutMutex;
 	public static Semaphore[] in;
-	public static Semaphore[] out;
-	public static Semaphore[][] testout;
-	public static Semaphore[] allOut;
-	public static ElevatorScene scene;	
+	public static Semaphore[][] out;
+	public static Semaphore[] allOut;	
 	public static Semaphore exitedCountMutex;
 	public static boolean elevatorsMayDie;
 
@@ -59,9 +57,10 @@ public class ElevatorScene {
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
 
+		// drepur þræðir sem voru lifandi
 		elevatorsMayDie = true;
 		if(elevatorThread != null) {
-			for(int i = 0; i < numberOfElevators; i++) {
+			for(int i = 0; i < this.numberOfElevators; i++) {
 				if(elevatorThread[i].isAlive()) {
 					try {
 						elevatorThread[i].join();
@@ -72,10 +71,10 @@ public class ElevatorScene {
 				}
 			}
 		}
-		elevatorsMayDie = false;
-		scene = this;
 		
-		personSemaphore = new Semaphore(0);
+		elevatorsMayDie = false;
+		
+		setIDSemaphore = new Semaphore(0);
 		getIDSemaphore = new Semaphore(0);
 		checkedOutSemaphore = new Semaphore(0);
 		personCountMutex = new Semaphore(1);
@@ -97,14 +96,10 @@ public class ElevatorScene {
 			in[i] = new Semaphore(0);
 		}
 		
-		out = new Semaphore[numberOfFloors];
-		for(int i = 0; i < numberOfFloors; i++) {
-			out[i] = new Semaphore(0);
-		}
-		testout = new Semaphore[numberOfElevators][numberOfFloors];
+		out = new Semaphore[numberOfElevators][numberOfFloors];
 		for(int i = 0; i < numberOfElevators; i++) {
 			for(int k = 0; k < numberOfFloors; k++) {
-				testout[i][k] = new Semaphore(0);
+				out[i][k] = new Semaphore(0);
 			}
 		}
 		
@@ -112,7 +107,6 @@ public class ElevatorScene {
 		for (int i = 0; i < numberOfElevators; i++) {
 			allOut[i] = new Semaphore(0);
 		}
-		//Elevator elevator = new Elevator(this);
 		
 
 		this.numberOfFloors = numberOfFloors;
@@ -168,15 +162,15 @@ public class ElevatorScene {
 		return thread;
 	}
 	
-	
+	// setur ID á lyftuni fyrir perónu
 	public void setElevatorID(int elevator) {
 		elevatorID = elevator;
 	}
-	
+	// til að sækja id á lyftunni sem persóna er að fara í
 	public int getElevatorID() {		
 		return elevatorID;
 	}
-	
+	// lækkar lyftu hæð
 	public void decrementFloor(int elevator){
 		try {
 			elvatorDownMutex.acquire();
@@ -190,7 +184,7 @@ public class ElevatorScene {
 			e.printStackTrace();
 		}
 	}
-	
+	// hækkar lyftu hæð
 	public void incrementFloor(int elevator){
 		try {
 			elvatorUpMutex.acquire();
@@ -201,7 +195,7 @@ public class ElevatorScene {
 			e.printStackTrace();
 		}
 	}
-	
+	// hækkar hversu margar persónu fór út á þessari hæð
 	public void personExitsAtFloor(int floor) {
 		try {
 			
@@ -214,7 +208,7 @@ public class ElevatorScene {
 			e.printStackTrace();
 		}
 	}
-	
+	// sýnir hversu margir eru farnir út á þessari hæð
 	public int getExitedCountAtFloor(int floor) {
 		if(floor < getNumberOfFloors()) {
 			return exitedCount.get(floor);
@@ -223,34 +217,34 @@ public class ElevatorScene {
 			return 0;
 		}
 	}
-	
+	// til að sækja hversu margir eru að fara út á þessari hæð í þessari lyftu
 	public int leaveThisFloor(int floor, int elevator) {
 		return leaveCount.get(floor).get(elevator);
 	}
-	
+	// til að hækka count á hversu margir eru að fara út á hæð
 	public void incLeaveThisFloor(int floor, int elevator) {
 		leaveCount.get(floor).set(elevator, leaveCount.get(floor).get(elevator) + 1);
 	}
-	
+	//til að lækka count á hversu margir eru að fara út á hæð
 	public void decLeaveThisFloor(int floor, int elevator) {
 		leaveCount.get(floor).set(elevator, leaveCount.get(floor).get(elevator) - 1);
 	}
-	
+	// til að hækka fólk fjölda sem er í lyftuni
 	public void incrementPeopleInElevator(int elevator){
 		pepsInElevator.set(elevator, (pepsInElevator.get(elevator) + 1));
 	}
-	
+	// til að lækka fólk fjölda sem er í lyftuni
 	public void decrementPeopleInElevator(int elevator){
 
 		if(pepsInElevator.get(elevator) != 0){
 			pepsInElevator.set(elevator, (pepsInElevator.get(elevator) - 1));
 		}
 	}
-	
+	// til að lækka fjölda sem bíða á hæð
 	public void decrementNumberOfPeopleWaitingAtFloor(int floor){
 		personCount.set(floor, (personCount.get(floor)- 1));
 	}
-	
+	// til að hækka fjölda sem bíða á hæð
 	public void incrementNumberOfPeopleWaitingAtFloor(int floor){
 		try {
 			personCountMutex.acquire();

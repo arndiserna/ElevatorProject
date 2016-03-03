@@ -9,8 +9,6 @@ public class Person implements Runnable{
 		this.out = out;
 		this.scene = scene;
 	}
-	//private ElevatorScene scene;
-	
 	
 	@Override
 	public void run() {
@@ -18,33 +16,28 @@ public class Person implements Runnable{
 				
 				scene.incrementNumberOfPeopleWaitingAtFloor(in);
 				ElevatorScene.in[in].acquire();
-				ElevatorScene.insideMutex.acquire();
 				
-				ElevatorScene.getIDSemaphore.acquire();
+				ElevatorScene.insideMutex.acquire();
+				ElevatorScene.setIDSemaphore.acquire();
 				inElevatorId = scene.getElevatorID();
-				ElevatorScene.personSemaphore.release();
+				ElevatorScene.getIDSemaphore.release();
 				scene.incLeaveThisFloor(out, inElevatorId);
-				//ElevatorScene.personSemaphore.acquire();
 				scene.incrementPeopleInElevator(inElevatorId);
 				scene.decrementNumberOfPeopleWaitingAtFloor(in);
-				//System.out.println("in");
 				ElevatorScene.insideMutex.release();
-				//ElevatorScene.out[out].acquire();
-				ElevatorScene.testout[inElevatorId][out].acquire();
+				
+				ElevatorScene.out[inElevatorId][out].acquire();
 				ElevatorScene.outsideMutex.acquire();
-				//System.out.println("UT");
 				scene.decLeaveThisFloor(out, inElevatorId);
 				scene.personExitsAtFloor(out);
 				scene.decrementPeopleInElevator(inElevatorId);
-				ElevatorScene.checkedOutSemaphore.release();
-				//while(scene.leaveThisFloor(out, inElevatorId) != 0 || scene.leaveThisFloor(out, inElevatorId) == 0) {
-				System.out.println(scene.leaveThisFloor(out, inElevatorId) + " eftir " +inElevatorId);
+				//ElevatorScene.checkedOutSemaphore.release();
+				// ef allir eru farnir út sem áttu að fara út á þessari hæð þá release() allout
 				if(scene.leaveThisFloor(out, inElevatorId) == 0) {
-					System.out.println("lyfta laus "+ inElevatorId);
 					ElevatorScene.allOut[inElevatorId].release();
 				}
-				
 				ElevatorScene.outsideMutex.release();
+				
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
